@@ -68,7 +68,7 @@ class Question {
 
 class AnswerOption {
   constructor(
-    public answer_id: string,
+    public answer_option_id: string,
     public question_id: Question["question_id"],
     public text: string,
     public is_correct: boolean
@@ -77,14 +77,20 @@ class AnswerOption {
 
 class QuestionResponse {
   constructor(
-    public question_res_id: string,
+    public question_response_id: string,
     public attempt_id: QuizAttempt["attempt_id"],
     public question_id: Question["question_id"],
-    public selected_options_ids: Array<AnswerOption["answer_id"]>,
     public free_text: string | null,
     public is_correct: boolean | null,
     public earned_points: number
   ) {}
+}
+
+class SelectedAnswer {
+  constructor(
+    public question_response_id: QuestionResponse["question_response_id"],
+    public answer_option_id: AnswerOption["answer_option_id"]
+    ) {}
 }
 
 class Review {
