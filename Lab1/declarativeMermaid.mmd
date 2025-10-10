@@ -39,17 +39,16 @@ erDiagram
   }
 
   AnswerOption {
-    uuid answer_id PK
+    uuid answer_option_id PK
     uuid question_id FK
     text text
     bool is_correct
   }
 
-  QuestionResponse {
-    uuid question_res_id PK
+QuestionResponse {
+    uuid question_response_id PK
     uuid attempt_id FK
     uuid question_id FK
-    uuid[] selected_options_ids
     text free_text
     bool is_correct
     int earned_points
@@ -62,6 +61,11 @@ erDiagram
     int rating
     text text
     timestamp created_at
+  }
+
+  SelectedAnswer {
+    uuid question_res_id FK
+    uuid answer_id FK
   }
 
   UserQuizStats {
@@ -77,7 +81,7 @@ erDiagram
   User ||--o{ QuizAttempt : "takes"
   Quiz ||--o{ QuizAttempt : "has"
 
-  Quiz ||--o{ Question : "contains"
+  Quiz ||--|{ Question : "contains"
   Question ||--o{ AnswerOption : "has"
 
   QuizAttempt ||--o{ QuestionResponse : "records"
@@ -89,4 +93,5 @@ erDiagram
   User ||--o{ UserQuizStats : "has"
   Quiz ||--o{ UserQuizStats : "aggregated in"
 
-  QuestionResponse }o--o{ AnswerOption : "selects"
+  QuestionResponse ||--o{ SelectedAnswer : "has details in"
+  AnswerOption ||--o{ SelectedAnswer : "is selected in"
