@@ -3,9 +3,9 @@ erDiagram
   User {
     uuid user_id PK
     string email
-    string password
-    string name
+    string username
     string avatar_url
+    timestamp created_at
   }
 
   Quiz {
@@ -17,7 +17,7 @@ erDiagram
     int attempts_limit
     timestamp created_at
     timestamp updated_at
-    int difficulty
+    string difficulty
   }
 
   QuizAttempt {
@@ -27,21 +27,21 @@ erDiagram
     timestamp started_at
     timestamp finished_at
     int score
-    int duration
+    string attempt_status
   }
 
   Question {
     uuid question_id PK
     uuid quiz_id FK
-    text text
-    string type
+    text question_text
+    string question_type
     int points
   }
 
   AnswerOption {
     uuid answer_option_id PK
     uuid question_id FK
-    text text
+    text option_text
     bool is_correct
   }
 
@@ -49,8 +49,7 @@ QuestionResponse {
     uuid question_response_id PK
     uuid attempt_id FK
     uuid question_id FK
-    text free_text
-    bool is_correct
+    text free_text_answer
     int earned_points
   }
 
@@ -59,13 +58,13 @@ QuestionResponse {
     uuid user_id FK
     uuid quiz_id FK
     int rating
-    text text
+    text review_text
     timestamp created_at
   }
 
   SelectedAnswer {
-    uuid question_res_id PK,FK
-    uuid answer_id PK,FK
+    uuid question_response_id PK,FK
+    uuid answer_option_id PK,FK
   }
 
   UserQuizStats {
@@ -74,6 +73,7 @@ QuestionResponse {
     int best_score
     int last_score
     timestamp updated_at
+    timestamp created_at
     int attempts
   }
 
@@ -82,7 +82,7 @@ QuestionResponse {
   Quiz ||--o{ QuizAttempt : "has"
 
   Quiz ||--|{ Question : "contains"
-  Question ||--o{ AnswerOption : "has"
+  Question ||--|{ AnswerOption : "has"
 
   QuizAttempt ||--o{ QuestionResponse : "records"
   Question ||--o{ QuestionResponse : "answered"
