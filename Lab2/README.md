@@ -21,3 +21,24 @@
 | FR13 | The system shall allow users to rate a test. |
 | FR14 | The system shall allow users to write a text review for a quiz. |
 | FR15 | The system shall allow users to view reviews left by others. |
+| FR16 | The system shall allow users to bookmark tests and view their list of bookmarked tests. |
+| FR17 | The system shall allow Authors to create a new test. |
+| FR18 | Creating a test shall require adding questions and their respective answer options. |
+| FR19 | Creating a test shall require filling in its details (e.g., title, description). |
+| FR20 | The system shall allow Authors to create various types of questions (single-choice, etc.). |
+| FR21 | The system shall allow Authors to edit test details. |
+| FR22 | The system shall allow Authors to delete their own tests. |
+| FR23 | The system shall allow Authors to edit questions within their tests. |
+| FR24 | The system shall allow Authors to delete questions from their tests. |
+| FR25 | The system shall allow Authors to view the results of all users who took their tests. |
+
+### Non-Functional Requirements (NFR)
+
+| ID | Requirement | Type |
+| :--- | :--- | :--- |
+| NFR1 | All user passwords must be stored in the database in a hashed format (e.g., SHA-256). | Security |
+| NFR2 | A test page containing 50 questions must load in under 3 seconds. | Performance |
+| NFR3 | The system must have an intuitive user interface for both taking tests and creating questions. | Usability |
+| NFR4 | The system shall be available 99.9% of the time (uptime). | Reliability |
+| NFR5 | The web interface must render correctly on the latest stable versions of Chrome, Firefox, and Safari. | Compatibility |
+| NFR6 | The email service must use a secure protocol (e.G., TLS) for sending emails. | Security |
