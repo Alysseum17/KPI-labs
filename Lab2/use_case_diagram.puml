@@ -49,7 +49,8 @@ rectangle "Quiz System" as System {
   usecase (View your results) as UC_ViewMyResults
   usecase (View result of all tests) as UC_ViewAllResults
 
-  usecase (Rate Quiz) as UC_RateQuiz
+
+  usecase (Rate test) as UC_RateTest
   usecase (Write text review) as UC_WriteReview
   usecase (View review) as UC_ViewReview
   usecase (Bookmark test) as UC_Bookmark
@@ -63,8 +64,7 @@ User --> UC_Profile
 User --> UC_FindTest
 User --> UC_TakeTest
 User --> UC_ViewMyResults
-User --> UC_RateQuiz
-User --> UC_WriteReview
+User --> UC_RateTest
 User --> UC_ViewReview
 User --> UC_Bookmark
 User --> UC_ViewBookmarks
@@ -82,7 +82,9 @@ UC_ChangePassword .> UC_SendReset : <<include>>
 Email --> UC_SendConfirm
 Email --> UC_SendReset
 
-UC_TakeTest .> UC_CreateTest : <<include>>
+UC_TakeTest .> UC_FindTest : <<include>>
+UC_FindTest .> UC_CreateTest : <<include>>
+UC_CreateTest .> UC_Login : <<include>>
 UC_AddQuestions .> UC_CreateTest : <<include>>
 UC_QuestSingle .> UC_AddQuestions : <<extend>>
 UC_QuestMultiple .> UC_AddQuestions : <<extend>>
@@ -93,15 +95,25 @@ UC_EditQuestion .> UC_AddQuestions : <<include>>
 UC_DeleteQuestion .> UC_AddQuestions : <<include>>
 UC_DeleteTest .> UC_CreateTest : <<include>>
 UC_EditTestDetails .> UC_CreateTest : <<include>>
+UC_Profile .> UC_Login : <<include>>
 UC_ChangeAvatar .> UC_Profile: <<extend>>
 UC_ChangeUsername .> UC_Profile: <<extend>>
 UC_ChangePassword .> UC_Profile: <<extend>>
-
+UC_WriteReview .> UC_RateTest: <<extend>>
+UC_RateTest .> UC_FindTest: <<include>>
+UC_RateTest .> UC_Login: <<include>>
+UC_ViewReview .> UC_FindTest: <<include>>
+UC_ViewMyResults .> UC_TakeTest: <<include>>
+UC_ViewAllResults .> UC_TakeTest: <<include>>
+UC_ViewAllResults .> UC_Login: <<include>>
 UC_Answer .> UC_TakeTest : <<include>>
 UC_AnsSingle .> UC_Answer : <<extend>>
-UC_AnsMulti  .> UC_Answer : <<extend>>
-UC_AnsFree   .> UC_Answer : <<extend>>
-UC_AnsRel    .> UC_Answer : <<extend>>
+UC_AnsMulti .> UC_Answer : <<extend>>
+UC_AnsFree .> UC_Answer : <<extend>>
+UC_AnsRel .> UC_Answer : <<extend>>
+UC_Bookmark .> UC_FindTest : <<include>>
+UC_Bookmark .> UC_Login : <<include>>
+UC_ViewBookmarks .> UC_Bookmark : <<include>>
 
 
 @enduml
