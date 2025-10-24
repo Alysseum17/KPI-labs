@@ -42,3 +42,57 @@
 | NFR4 | The system shall be available 99.9% of the time (uptime). | Reliability |
 | NFR5 | The web interface must render correctly on the latest stable versions of Chrome, Firefox, and Safari. | Compatibility |
 | NFR6 | The email service must use a secure protocol (e.G., TLS) for sending emails. | Security |
+
+## 3. Traceability Matrix (FR ↔ UC)
+
+**Use Case Legend:**
+* **Reg:** `Register`
+* **SendConfirm:** `Send Confirmation Email`
+* **Login:** `Authorize`
+* **Profile:** `Manage profile`
+* **ChgPass:** `Change password`
+* **SendReset:** `Send Password Reset Link`
+* **Find:** `Find test`
+* **Take:** `Take a test`
+* **Answer:** `Answer the question`
+* **MyRes:** `View your results`
+* **AllRes:** `View result of all tests`
+* **Rate:** `Rate test`
+* **Write:** `Write text review`
+* **ViewRev:** `View review`
+* **Bookmark:** `Bookmark test`
+* **ViewBookmark:** `View bookmarked tests`
+* **Create:** `Create test`
+* **AddQ:** `Add questions`
+* **EditQ:** `Edit question`
+* **DelQ:** `Delete question`
+* **EditTest:** `Edit test details`
+* **DelTest:** `Delete test`
+
+| FR ID | Reg | SendConfirm | Login | Profile | ChgPass | SendReset | Find | Take | Answer | MyRes | AllRes | Rate | Write | ViewRev | Bookmark | ViewBookmark | Create | AddQ | EditQ | DelQ | EditTest | DelTest |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **FR1** | X | | | | | | | | | | | | | | | | | | | | | |
+| **FR2** | X | X | | | | | | | | | | | | | | | | | | | |
+| **FR3** | | | X | | | | | | | | | | | | | | | | | | |
+| **FR4** | | | | X | | | | | | | | | | | | | | | | | |
+| **FR5** | | | | X | | | | | | | | | | | | | | | | | |
+| **FR6** | | | | X | X | | | | | | | | | | | | | | | |
+| **FR7** | | | | | X | X | | | | | | | | | | | | | | |
+| **FR8** | | | | | | | X | | | | | | | | | | | | | |
+| **FR9** | | | | | | | | X | | | | | | | | | | | | |
+| **FR10** | | | | | | | | X | X | | | | | | | | | | | |
+| **FR11** | | | | | | | | | X | | | | | | | | | | | |
+| **FR12** | | | | | | | | | | X | | | | | | | | | | |
+| **FR13** | | | | | | | | | | | | X | | | | | | | | |
+| **FR14** | | | | | | | | | | | | | X | | | | | | | |
+| **FR15** | | | | | | | | | | | | | | X | | | | | | |
+| **FR16** | | | | | | | | | | | | | | | X | X | | | | | |
+| **FR17** | | | | | | | | | | | | | | | | | X | | | | |
+| **FR18** | | | | | | | | | | | | | | | | | X | X | | | |
+| **FR19** | | | | | | | | | | | | | | | | | X | | | | X |
+| **FR20** | | | | | | | | | | | | | | | | | | X | | | |
+| **FR21** | | | | | | | | | | | | | | | | | | | | X |
+| **FR22** | | | | | | | | | | | | | | | | | | | | | X |
+| **FR23** | | | | | | | | | | | | | | | | | | X | | |
+| **FR24** | | | | | | | | | | | | | | | | | | | X | |
+| **FR25** | | | | | | | | | | | X | | | | | | | | | |
