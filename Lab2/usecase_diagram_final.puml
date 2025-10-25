@@ -9,7 +9,6 @@ skinparam usecase {
 
 actor User
 actor Author
-actor "Email service" as Email
 
 
 Author --|> User
@@ -77,8 +76,6 @@ Author --> UC_ManageTest
 
 UC_Register .> UC_SendConfirm : <<include>>
 UC_ChangePassword .> UC_SendReset : <<include>>
-Email --> UC_SendConfirm
-Email --> UC_SendReset
 
 UC_TakeTest .> UC_FindTest : <<include>>
 UC_FindTest .> UC_CreateTest : <<include>>
