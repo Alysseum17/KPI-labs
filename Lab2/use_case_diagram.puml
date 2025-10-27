@@ -9,14 +9,12 @@ skinparam usecase {
 
 actor User
 actor Author
-actor "Email service" as Email
 
 
 Author --|> User
 
 rectangle "Quiz System" as System {
   usecase (Register) as UC_Register
-  usecase (Authorize) as UC_Login
   usecase (Manage profile) as UC_Profile
   usecase (Change avatar) as UC_ChangeAvatar
   usecase (Change username) as UC_ChangeUsername
@@ -26,6 +24,7 @@ rectangle "Quiz System" as System {
 
 
   usecase (Create test) as UC_CreateTest
+  usecase (Manage test) as UC_ManageTest
   usecase (Add questions) as UC_AddQuestions
   usecase (Add question with single answer) as UC_QuestSingle
   usecase (Add question with multiple answers) as UC_QuestMultiple
@@ -59,7 +58,6 @@ rectangle "Quiz System" as System {
 
 
 User --> UC_Register
-User --> UC_Login
 User --> UC_Profile
 User --> UC_FindTest
 User --> UC_TakeTest
@@ -68,52 +66,44 @@ User --> UC_RateTest
 User --> UC_ViewReview
 User --> UC_Bookmark
 User --> UC_ViewBookmarks
+User --> UC_ViewAllResults
 
 Author --> UC_CreateTest
+Author --> UC_ManageTest
 Author --> UC_AddQuestions
-Author --> UC_EditQuestion
-Author --> UC_DeleteQuestion
-Author --> UC_EditTestDetails
-Author --> UC_DeleteTest
-Author --> UC_ViewAllResults
+Author --> UC_AddOptions
+
 
 UC_Register .> UC_SendConfirm : <<include>>
 UC_ChangePassword .> UC_SendReset : <<include>>
-Email --> UC_SendConfirm
-Email --> UC_SendReset
 
 UC_TakeTest .> UC_FindTest : <<include>>
 UC_FindTest .> UC_CreateTest : <<include>>
-UC_CreateTest .> UC_Login : <<include>>
-UC_AddQuestions .> UC_CreateTest : <<include>>
+UC_CreateTest .> UC_ManageTest : <<include>>
+UC_ManageTest .> UC_AddQuestions : <<include>>
+UC_EditTestDetails .> UC_ManageTest : <<extend>>
+UC_DeleteTest .> UC_ManageTest : <<extend>>
+UC_EditQuestion .> UC_ManageTest : <<extend>>
+UC_DeleteQuestion .> UC_ManageTest : <<extend>>
 UC_QuestSingle .> UC_AddQuestions : <<extend>>
 UC_QuestMultiple .> UC_AddQuestions : <<extend>>
 UC_QuestFree .> UC_AddQuestions : <<extend>>
 UC_QuestRel .> UC_AddQuestions : <<extend>>
-UC_AddOptions .> UC_AddQuestions : <<include>>
-UC_EditQuestion .> UC_AddQuestions : <<include>>
-UC_DeleteQuestion .> UC_AddQuestions : <<include>>
-UC_DeleteTest .> UC_CreateTest : <<include>>
-UC_EditTestDetails .> UC_CreateTest : <<include>>
-UC_Profile .> UC_Login : <<include>>
+UC_AddQuestions .> UC_AddOptions : <<include>>
 UC_ChangeAvatar .> UC_Profile: <<extend>>
 UC_ChangeUsername .> UC_Profile: <<extend>>
 UC_ChangePassword .> UC_Profile: <<extend>>
 UC_WriteReview .> UC_RateTest: <<extend>>
 UC_RateTest .> UC_FindTest: <<include>>
-UC_RateTest .> UC_Login: <<include>>
 UC_ViewReview .> UC_FindTest: <<include>>
-UC_ViewMyResults .> UC_TakeTest: <<include>>
-UC_ViewAllResults .> UC_TakeTest: <<include>>
-UC_ViewAllResults .> UC_Login: <<include>>
-UC_Answer .> UC_TakeTest : <<include>>
+UC_ViewMyResults .> UC_TakeTest: <<extend>>
+UC_TakeTest .> UC_Answer : <<include>>
 UC_AnsSingle .> UC_Answer : <<extend>>
 UC_AnsMulti .> UC_Answer : <<extend>>
 UC_AnsFree .> UC_Answer : <<extend>>
 UC_AnsRel .> UC_Answer : <<extend>>
 UC_Bookmark .> UC_FindTest : <<include>>
-UC_Bookmark .> UC_Login : <<include>>
-UC_ViewBookmarks .> UC_Bookmark : <<include>>
+
 
 
 @enduml
