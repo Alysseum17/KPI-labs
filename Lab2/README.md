@@ -47,28 +47,29 @@
 ## 3. Traceability Matrix (FR $\leftrightarrow$ UC)
 
 **Use Case Legend:**
-Reg: Register
-SendConfirm: Send Confirmation Email
-Profile: Manage profile
-ChgPass: Change password
-SendReset: Send Password Reset Link
-Find: Find test
-Take: Take a test
-Answer: Answer the question
-MyRes: View your results of test
-AllRes: View result of all tests
-Rate: Rate test
-Write: Write text review
-ViewRev: View review
-Bookmark: Bookmark test
-ViewBookmark: View bookmarked tests
-Create: Create test
-AddQ: Add questions
-AddOptions: Add answer options
-EditQ: Edit question
-DelQ: Delete question
-EditTest: Edit test details
-DelTest: Delete test
+
+* **Reg:** Register
+* **SendConfirm:** Send Confirmation Email
+* **Profile:** Manage profile
+* **ChgPass:** Change password
+* **SendReset:** Send Password Reset Link
+* **Find:** Find test
+* **Take:** Take a test
+* **Answer:** Answer the question
+* **MyRes:** View your results of test
+* **AllRes:** View result of all tests
+* **Rate:** Rate test
+* **Write:** Write text review
+* **ViewRev:** View review
+* **Bookmark:** Bookmark test
+* **ViewBookmark:** View bookmarked tests
+* **Create:** Create test
+* **AddQ:** Add questions
+* **AddOptions:** Add answer options
+* **EditQ:** Edit question
+* **DelQ:** Delete question
+* **EditTest:** Edit test details
+* **DelTest:** Delete test
 
 | FR ID | Reg | SendConfirm | Profile | ChgPass | SendReset | Find | Take | Answer | MyRes | AllRes | Rate | Write | ViewRev | Bookmark | ViewBookmark | Create | AddQ | AddOptions | EditQ | DelQ | EditTest | DelTest |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
