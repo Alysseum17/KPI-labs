@@ -70,8 +70,7 @@
 * **DelQ:** Delete question
 * **EditTest:** Edit test details
 * **DelTest:** Delete test
-
-### 3. Traceability Matrix (FR ↔ UC)
+  
 
 | FR ID | Reg | SendConfirm | Profile | ChgPass | SendReset | Find | Take | Answer | MyRes | AllRes | Rate | Write | ViewRev | Bookmark | ViewBookmark | Create | AddQ | AddOptions | EditQ | DelQ | EditTest | DelTest |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
