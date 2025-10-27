@@ -74,7 +74,7 @@
 
 | FR ID | Reg | SendConfirm | Profile | ChgPass | SendReset | Find | Take | Answer | MyRes | AllRes | Rate | Write | ViewRev | Bookmark | ViewBookmark | Create | AddQ | AddOptions | EditQ | DelQ | EditTest | DelTest |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **FR1** | X | |X | | | | | | | | | | | | | | | | | | | |
+| **FR1** | X | | | | | | | | | | | | | | | | | | | | | |
 | **FR2** | X | X | | | | | | | | | | | | | | | | | | | | |
 | **FR3** | | | X | | | | | | | | | | | | | | | | | | | |
 | **FR4** | | | X | | | | | | | | | | | | | | | | | | | |
