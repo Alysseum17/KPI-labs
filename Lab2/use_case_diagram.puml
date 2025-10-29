@@ -54,6 +54,7 @@ rectangle "Quiz System" as System {
   usecase (View review) as UC_ViewReview
   usecase (Bookmark test) as UC_Bookmark
   usecase (View bookmarked tests) as UC_ViewBookmarks
+  usecase (View quiz stats) as UC_ViewStats
 }
 
 
@@ -72,6 +73,7 @@ Author --> UC_CreateTest
 Author --> UC_ManageTest
 Author --> UC_AddQuestions
 Author --> UC_AddOptions
+Author --> UC_ViewStats
 
 
 UC_Register .> UC_SendConfirm : <<include>>
@@ -80,6 +82,7 @@ UC_ChangePassword .> UC_SendReset : <<include>>
 UC_TakeTest .> UC_FindTest : <<include>>
 UC_FindTest .> UC_CreateTest : <<include>>
 UC_CreateTest .> UC_ManageTest : <<include>>
+UC_ViewStats .> UC_CreateTest : <<include>>
 UC_ManageTest .> UC_AddQuestions : <<include>>
 UC_EditTestDetails .> UC_ManageTest : <<extend>>
 UC_DeleteTest .> UC_ManageTest : <<extend>>
