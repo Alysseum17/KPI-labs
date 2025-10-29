@@ -1,0 +1,51 @@
+sequenceDiagram
+    actor Author
+    participant QuizSystem
+    actor User
+
+
+    Author->>QuizSystem: 1. Create test(createQuiz)
+    activate QuizSystem
+    loop more questions to add
+        Author->>QuizSystem: 2. Add question(addQuestion)
+        Author->>QuizSystem: 3. Add options(addOptions)
+    end
+    QuizSystem-->>Author: 4. Test created notification (return: newQuizId)
+    deactivate QuizSystem
+
+
+    User->>QuizSystem: 5. Start attempt(startAttempt)
+    activate QuizSystem
+    QuizSystem-->>User: 6. Return first question (returnFirstQuestion)
+  
+
+    loop until finish quiz
+        User->>QuizSystem: 7. Answer question
+    
+        alt isnt last question
+            QuizSystem-->>User: 8. Return next question (returnNextQuestion)
+        else is last question
+            QuizSystem-->>User: 9. Return results(returnResult)
+        end
+    end
+    deactivate QuizSystem
+    
+    opt user decides to leave a review
+    activate QuizSystem
+        User->>QuizSystem: 10. Give feedback(giveFeedback)
+        QuizSystem-->>User: 11. Review saved notification (returnReviewSendNotification)
+       
+    end
+     deactivate QuizSystem
+
+    Author->>QuizSystem: 12. Ask quiz stats(askQuizStats)
+    activate QuizSystem
+    QuizSystem-->>Author: 13. Return quiz stats (returnQuizStats)
+
+
+    loop constructive bad reviews exist
+        opt has a constructive bad reviews
+            Author->>QuizSystem: 14. Change quiz(changeQuiz)
+        end
+    end
+    deactivate QuizSystem
