@@ -1,0 +1,55 @@
+sequenceDiagram
+    actor Author
+    participant QuizSystem
+    participant Database
+
+
+    Author->>QuizSystem: 1. Create test (title, description, difficulty)
+    activate QuizSystem
+    
+
+    QuizSystem->>Database: 2. INSERT INTO quizes (author_id, title, ...)<br/>[TRANSACTION START]
+    activate Database
+    Database-->>QuizSystem: 3. Return new_quiz_id
+    deactivate Database
+    
+
+    QuizSystem-->>Author: 4. Quiz created (new_quiz_id)
+    deactivate QuizSystem
+
+
+    loop Author adds questions
+        Author->>QuizSystem: 5. Add question (quiz_id, text, type, points)
+        activate QuizSystem
+        
+
+        QuizSystem->>Database: 6. INSERT INTO questions (quiz_id, question_text, ...)<br/>[PART OF TRANSACTION]
+        activate Database
+        Database-->>QuizSystem: 7. Return new_question_id
+        deactivate Database
+
+  
+        loop Author adds options to questions
+            Author->>QuizSystem: 8. Add option (question_id, text, is_correct)
+            
+        
+            QuizSystem->>Database: 9. INSERT INTO answer_options (question_id, option_text, ...)<br/>[PART OF TRANSACTION]
+            activate Database
+            Database-->>QuizSystem: 10. OK
+            deactivate Database
+        end
+        
+        QuizSystem-->>Author: 11. Question & options added
+        deactivate QuizSystem
+    end
+
+    Author->>QuizSystem: 12. Publish quiz (quiz_id)
+    activate QuizSystem
+    
+    QuizSystem->>Database: 13. UPDATE quizes SET is_active = true WHERE quiz_id = ...<br/>[TRANSACTION COMMIT]
+    activate Database
+    Database-->>QuizSystem: 14. OK
+    deactivate Database
+    
+    QuizSystem-->>Author: 15. Quiz published!
+    deactivate QuizSystem
