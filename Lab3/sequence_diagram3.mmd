@@ -1,0 +1,80 @@
+sequenceDiagram
+    actor User
+    participant QuizSystem
+    participant Database
+
+
+    User->>QuizSystem: 1. Start attempt (quiz_id)
+    activate QuizSystem
+
+
+    QuizSystem->>Database: 2. INSERT INTO quiz_attempts (user_id, quiz_id, started_at)<br/>[TRANSACTION START]
+    activate Database
+    Database-->>QuizSystem: 3. Return new_attempt_id
+    deactivate Database
+
+
+    QuizSystem->>Database: 4. SELECT * FROM questions WHERE quiz_id = ... ORDER BY ... LIMIT 1
+    activate Database
+    Database-->>QuizSystem: 5. Return question_data
+    deactivate Database
+    
+
+    QuizSystem->>Database: 6. SELECT * FROM answer_options WHERE question_id = ...
+    activate Database
+    Database-->>QuizSystem: 7. Return options_data
+    deactivate Database
+
+    QuizSystem-->>User: 8. Return first question (question_data, options_data)
+    deactivate QuizSystem
+
+    loop until finish quiz
+        User->>QuizSystem: 9. Answer question (attempt_id, question_id, answer)
+        activate QuizSystem
+
+        QuizSystem->>Database: 10. INSERT INTO question_responses (attempt_id, question_id, ...)<br/>[PART OF TRANSACTION]
+        activate Database
+        Database-->>QuizSystem: 11. Return new_question_response_id
+        deactivate Database
+
+    
+        opt question_type is 'single_choice' or 'multiple_choice'
+             QuizSystem->>Database: 12. INSERT INTO selected_answers (question_response_id, ...)<br/>[PART OF TRANSACTION]
+             activate Database
+             Database-->>QuizSystem: 13. OK
+             deactivate Database
+        end
+
+
+        alt isn't last question
+       
+            QuizSystem->>Database: 14. SELECT * FROM questions WHERE quiz_id = ... OFFSET ... LIMIT 1
+            activate Database
+            Database-->>QuizSystem: 15. Return next_question_data
+            deactivate Database
+            
+            QuizSystem->>Database: 16. SELECT * FROM answer_options WHERE question_id = ...
+            activate Database
+            Database-->>QuizSystem: 17. Return next_options_data
+            deactivate Database
+            
+            QuizSystem-->>User: 18. Return next question (question_data, options_data)
+
+        else is last question
+    
+        
+            
+            QuizSystem->>Database: 19. UPDATE quiz_attempts SET score = ..., finished_at = NOW() WHERE attempt_id = ...<br/>[PART OF TRANSACTION]
+            activate Database
+            Database-->>QuizSystem: 20. OK
+            deactivate Database
+
+            QuizSystem->>Database: 21. INSERT INTO user_quiz_stats (...) VALUES (...) ON CONFLICT (...) DO UPDATE ...<br/>[TRANSACTION COMMIT]
+            activate Database
+            Database-->>QuizSystem: 22. OK
+            deactivate Database
+            
+            QuizSystem-->>User: 23. Return results (score, correct_answers)
+        end
+        deactivate QuizSystem
+    end
