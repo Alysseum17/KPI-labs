@@ -30,6 +30,7 @@
 | FR22 | The system shall allow Authors to edit questions within their tests. |
 | FR23 | The system shall allow Authors to delete questions from their tests. |
 | FR24 | The system shall allow users to view their personal statistics and history of completed tests within their profile. |
+| FR25 | The system shall allow Authors to view statistics for the tests they have created. |
 
 ### Non-Functional Requirements (NFR)
 
@@ -70,31 +71,33 @@
 * **DelQ:** Delete question
 * **EditTest:** Edit test details
 * **DelTest:** Delete test
+* **ViewStats:** View test stats
   
 
-| FR ID | Reg | SendConfirm | Profile | ChgPass | SendReset | Find | Take | Answer | MyRes | AllRes | Rate | Write | ViewRev | Bookmark | ViewBookmark | Create | AddQ | AddOptions | EditQ | DelQ | EditTest | DelTest |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **FR1** | X | | X | X | | | | | | | | | | | | | | | | | | |
-| **FR2** | X | X | | | | | | | | | | | | | | | | | | | | |
-| **FR3** | X | | X | | | | | | | | | | | | | | | | | | | |
-| **FR4** | X | | X | | | | | | | | | | | | | | | | | | | |
-| **FR5** | X | X | X | X | | | | | | | | | | | | | | | | | | |
-| **FR6** | | | X | X | X | | | | | | | | | | | | | | | | | |
-| **FR7** | | | | | | X | | | | | | | X | X | X | | | | | | | |
-| **FR8** | | | | | | | X | X | X | | | X | X | X | X | | | | | | | |
-| **FR9** | | | | | | | X | X | X | | | | | | | | | | | | | |
-| **FR10** | | | | | | | X | X | | | | | | | | X | X | X | X | | | |
-| **FR11** | | | | | | | X | X | X | | X | X | | X | X | | | | | | | |
-| **FR12** | | | | | | | X | | X | | X | X | X | | | | | | | | | |
-| **FR13** | | | | | | X | X | | X | | | X | X | | | | | | | | | |
-| **FR14** | | | | | | X | X | | | | | X | X | | X | | | | | | | |
-| **FR15** | | | | | | X | | | | | | | X | X | X | | | | | | | |
-| **FR16** | | | | | | | | | | | | | | | | X | | | | | | |
-| **FR17** | | | | | | | | | | | | | | | | X | X | X | | | | |
-| **FR18** | | | | | | | | | | | | | | | | X | | | | | X | |
-| **FR19** | | | | | | | | | | | | | | | | X | X | | X | | | |
-| **FR20** | | | | | | | | X | | | | | | | | X | | | | | X | |
-| **FR21** | | | | | | | | | | | | | | | | X | | | | | | X |
-| **FR22** | | | | | | | | | | | | | | | | | | | X | | X | |
-| **FR23** | | | | | | | | | | | | | | | | | | | | X | X | |
-| **FR24** | X | | X | | | | | | X | X | | | | | X | X | | | | | | |
+| FR ID | Reg | SendConfirm | Profile | ChgPass | SendReset | Find | Take | Answer | MyRes | AllRes | Rate | Write | ViewRev | Bookmark | ViewBookmark | Create | AddQ | AddOptions | EditQ | DelQ | EditTest | DelTest | ViewStats |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **FR1** | X | | X | X | | | | | | | | | | | | | | | | | | | |
+| **FR2** | X | X | | | | | | | | | | | | | | | | | | | | | |
+| **FR3** | X | | X | | | | | | | | | | | | | | | | | | | | |
+| **FR4** | X | | X | | | | | | | | | | | | | | | | | | | | |
+| **FR5** | X | X | X | X | | | | | | | | | | | | | | | | | | | |
+| **FR6** | | | X | X | X | | | | | | | | | | | | | | | | | | |
+| **FR7** | | | | | | X | | | | | | | X | X | X | | | | | | | | |
+| **FR8** | | | | | | | X | X | X | | | X | X | X | X | | | | | | | | |
+| **FR9** | | | | | | | X | X | X | | | | | | | | | | | | | | |
+| **FR10** | | | | | | | X | X | | | | | | | | X | X | X | X | | | | |
+| **FR11** | | | | | | | X | X | X | | X | X | | X | X | | | | | | | | |
+| **FR12** | | | | | | | X | | X | | X | X | X | | | | | | | | | | |
+| **FR13** | | | | | | X | X | | X | | | X | X | | | | | | | | | | |
+| **FR14** | | | | | | X | X | | | | | X | X | | X | | | | | | | | |
+| **FR15** | | | | | | X | | | | | | | X | X | X | | | | | | | | |
+| **FR16** | | | | | | | | | | | | | | | | X | | | | | | | |
+| **FR17** | | | | | | | | | | | | | | | | X | X | X | | | | | |
+| **FR18** | | | | | | | | | | | | | | | | X | | | | | X | | |
+| **FR19** | | | | | | | | | | | | | | | | X | X | | X | | | | |
+| **FR20** | | | | | | | | X | | | | | | | | X | | | | | X | | |
+| **FR21** | | | | | | | | | | | | | | | | X | | | | | | X | |
+| **FR22** | | | | | | | | | | | | | | | | | | | X | | X | | |
+| **FR23** | | | | | | | | | | | | | | | | | | | | X | X | | |
+| **FR24** | X | | X | | | | | | X | X | | | | | X | X | | | | | | | |
+| **FR25** | | | | | | X | | | | X | | | | | | X | | | | | | | X |
