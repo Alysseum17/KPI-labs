@@ -40,7 +40,7 @@
 | NFR2 | A test page containing 50 questions must load in under 3 seconds. | Performance |
 | NFR3 | The system must have an intuitive user interface for both taking tests and creating questions. | Usability |
 | NFR4 | The system shall be available 99.9% of the time (uptime). | Reliability |
-| NFR5 | The web interface must render correctly on the latest stable versions of Chrome, Firefox, and Safari. | Compatibility |
+| NFR5 | The web interface must render correctly on Chrome version 141 and newer, Firefox version 143 and newer, and Safari version 18 and newer. | Compatibility |
 | NFR6 | The email service must use a secure protocol (e.g., TLS) for sending emails. | Security |
 
 ***
