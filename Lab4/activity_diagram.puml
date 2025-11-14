@@ -6,13 +6,13 @@ start
 :Browse Quizzes;
 :Select quiz;
 
-repeat
-    :View quiz info;
+:View quiz info;
+  repeat
     :Click start button;
+    :Start button clicked;
     note right: Signal: Start button clicked
-    
     |QuizSystem|
-    
+    :Start button clicked;
     fork
         :Load questions;
     fork again
@@ -32,9 +32,11 @@ repeat
         :Receive question;
         :Read question;
         :Select answer;
+        :Answer selected;
         note right: Signal: Answer selected
         
         |QuizSystem|
+        :Answer selected;
         :Save answer;
         :Calculate points;
         
@@ -55,8 +57,7 @@ repeat
     |User|
     :View results;
     
-repeat while (Want restart?) is (Yes) not (No)
-->No;
+repeat while (Want restart?) is (Yes) not (No);
 
 if (Leave review?) then (Yes)
     :Rate quiz;
@@ -66,8 +67,11 @@ if (Leave review?) then (Yes)
     
     |QuizSystem|
     :Save review;
+    :Review saved notification;
+     note right: Signal: Review saved notification
     
     |User|
+    :Review saved notification;
 else (No)
 endif
 
