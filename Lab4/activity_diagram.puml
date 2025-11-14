@@ -1,0 +1,76 @@
+@startuml
+title Проходження тесту (Activity Diagram)
+
+|User|
+start
+:Browse Quizzes;
+:Select quiz;
+
+repeat
+    :View quiz info;
+    :Click start button;
+    note right: Signal: Start button clicked
+    
+    |QuizSystem|
+    
+    fork
+        :Load questions;
+    fork again
+        :Create quiz attempt;
+    fork again
+        if (Start timer?) then (Yes)
+            :Start timer;
+        else (No)
+        endif
+    end fork
+    
+    repeat
+        :Send question;
+        note right: Data: Question
+        
+        |User|
+        :Receive question;
+        :Read question;
+        :Select answer;
+        note right: Signal: Answer selected
+        
+        |QuizSystem|
+        :Save answer;
+        :Calculate points;
+        
+    repeat while (More questions?) is (Yes)
+    ->No;
+    
+    fork
+        :Calculate total score;
+    fork again
+        :Save results;
+    fork again
+        :Update user quiz stats;
+    end fork
+    
+    :Send results;
+    note right: Data: Results
+    
+    |User|
+    :View results;
+    
+repeat while (Want restart?) is (Yes) not (No)
+->No;
+
+if (Leave review?) then (Yes)
+    :Rate quiz;
+    :Write review;
+    :Publish review;
+    note right: Data: Review
+    
+    |QuizSystem|
+    :Save review;
+    
+    |User|
+else (No)
+endif
+
+stop
+
+@enduml
