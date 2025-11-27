@@ -1,0 +1,188 @@
+@startuml API_System_Double_Interfaces
+
+!define COMPONENT_BG_COLOR #E1F5FF
+!define SERVICE_BG_COLOR #FFF4E1
+!define CONTROLLER_BG_COLOR #FFE1F5
+!define LAYER_BG_COLOR #FAFAFA
+!define SCHEMA_BG_COLOR #F0F0F0
+
+skinparam componentStyle uml2
+skinparam linetype polyline
+left to right direction 
+
+skinparam component {
+  BackgroundColor White
+  BorderColor Black
+}
+
+skinparam port {
+  FontSize 0
+  FontColor transparent
+}
+
+component "HTTP Router" as router
+database "PostgreSQL" as postgres
+cloud "SMTP Server" as smtp
+
+component "API Server System" as System {
+
+    port " " as pSysAuth
+    port " " as pSysError
+    port " " as pSysConfig
+    
+    port " " as pSysSqlOut
+    port " " as pSysSmtpOut
+
+    component "Zod Schemas Layer" as LayerValidation LAYER_BG_COLOR {
+        port " " as pValQuiz
+        port " " as pValAuth
+        port " " as pValUser
+        
+        component "Quizz zod schema" as quizzSchema SCHEMA_BG_COLOR
+        component "Auth zod schema" as authSchema SCHEMA_BG_COLOR
+        component "User zod schema" as userSchema SCHEMA_BG_COLOR
+        
+        pValQuiz --> quizzSchema
+        pValAuth --> authSchema
+        pValUser --> userSchema
+    }
+
+    component "Controllers Layer" as LayerControllers LAYER_BG_COLOR {
+        port " " as pCtrlConfigIn
+        port " " as pCtrlErrIn
+        
+        port " " as pCtrlSvcAuth
+        port " " as pCtrlSvcQuiz
+        port " " as pCtrlSvcUser
+        
+        port " " as pCtrlValOut
+        port " " as pCtrlErrOut
+        
+        component "Auth controller" as cAuth CONTROLLER_BG_COLOR
+        component "Quizz controller" as cQuiz CONTROLLER_BG_COLOR
+        component "User controller" as cUser CONTROLLER_BG_COLOR
+        component "Global Error Handler" as cErr CONTROLLER_BG_COLOR
+        
+        pCtrlConfigIn --> cAuth
+        pCtrlConfigIn --> cQuiz
+        pCtrlConfigIn --> cUser
+        pCtrlErrIn --> cErr
+        
+        cAuth --> pCtrlSvcAuth
+        cQuiz --> pCtrlSvcQuiz
+        cUser --> pCtrlSvcUser
+        
+        cAuth --> pCtrlValOut
+        cQuiz --> pCtrlValOut
+        cUser --> pCtrlValOut
+        
+        cUser ..> cErr : next(err)
+        cAuth ..> cErr : next(err)
+        cQuiz ..> cErr : next(err)
+        cErr --> pCtrlErrOut
+    }
+
+    component "Services Layer" as LayerServices LAYER_BG_COLOR {
+        port " " as pSvcAuthAPI_In
+        port " " as pSvcQuizAPI_In
+        port " " as pSvcUserAPI_In
+        
+        port " " as pSvcAuthLogic_In
+        port " " as pSvcQuizLogic_In
+        port " " as pSvcUserLogic_In
+        
+        port " " as pSvcOut
+        port " " as pSvcMail
+        
+        component "Auth Service" as sAuth SERVICE_BG_COLOR
+        component "Quiz Service" as sQuiz SERVICE_BG_COLOR
+        component "User Service" as sUser SERVICE_BG_COLOR
+        
+        () "Auth API" as I_AuthAPI
+        () "Quizz API" as I_QuizAPI
+        () "User API" as I_UserAPI
+        
+        () "Auth Service" as I_AuthSvc
+        () "Quizz Service" as I_QuizSvc
+        () "User Service" as I_UserSvc
+        
+        sAuth -up- I_AuthAPI
+        sAuth -left- I_AuthSvc
+        
+        sQuiz -up- I_QuizAPI
+        sQuiz -left- I_QuizSvc
+        
+        sUser -up- I_UserAPI
+        sUser -left- I_UserSvc
+        
+        pSvcAuthAPI_In --( I_AuthAPI
+        
+        pSvcAuthLogic_In -- I_AuthSvc
+        pSvcQuizLogic_In -- I_QuizSvc
+        pSvcUserLogic_In -- I_UserSvc
+        
+        sAuth --> pSvcOut
+        sQuiz --> pSvcOut
+        sUser --> pSvcOut
+        sAuth --> pSvcMail
+    }
+
+    component "Prisma ORM" as prisma COMPONENT_BG_COLOR
+    component "Mail Service" as mailer COMPONENT_BG_COLOR
+
+    pSysAuth --> pSvcAuthAPI_In
+    
+    pSysConfig --( "Quizz EntryPoints"
+    "Quizz EntryPoints" -- pCtrlConfigIn
+    
+    pSysConfig --( "Auth EntryPoints"
+    "Auth EntryPoints" -- pCtrlConfigIn
+    
+    pSysConfig --( "User EntryPoints"
+    "User EntryPoints" -- pCtrlConfigIn
+    
+    pSysError --> pCtrlErrIn
+    
+    pCtrlSvcAuth --> pSvcAuthLogic_In
+    pCtrlSvcQuiz --> pSvcQuizLogic_In
+    pCtrlSvcUser --> pSvcUserLogic_In
+    
+    pCtrlValOut --( "Quizz Validation Schema"
+    "Quizz Validation Schema" -- pValQuiz
+    pCtrlValOut --( "Auth Validation Schema"
+    "Auth Validation Schema" -- pValAuth
+    pCtrlValOut --( "User Validation Schema"
+    "User Validation Schema" -- pValUser
+    
+    pSvcOut --( "IDataAccess"
+    "IDataAccess" -- prisma
+    pSvcMail --( "ISendMail"
+    "ISendMail" -- mailer
+    
+    prisma --> pSysSqlOut
+    mailer --> pSysSmtpOut
+}
+
+() "Auth" as I_Auth
+() "Error Handling" as I_Error
+() "EntryPoint Config" as I_Config
+
+pSysAuth -up- I_Auth
+pSysError -up- I_Error
+pSysConfig -up- I_Config
+
+router --( I_Auth
+router --( I_Error
+router --( I_Config
+
+pSysSqlOut --( "SQL Protocol"
+"SQL Protocol" -- postgres
+pSysSmtpOut --( "SMTP Protocol"
+"SMTP Protocol" -- smtp
+
+router -[hidden]-> LayerControllers
+LayerValidation -[hidden]-> LayerControllers
+LayerControllers -[hidden]-> LayerServices
+LayerServices -[hidden]-> prisma
+
+@enduml
