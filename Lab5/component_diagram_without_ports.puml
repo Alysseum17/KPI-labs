@@ -1,0 +1,105 @@
+@startuml 
+
+!define COMPONENT_BG_COLOR #E1F5FF
+!define SERVICE_BG_COLOR #FFF4E1
+!define CONTROLLER_BG_COLOR #FFE1F5
+!define SCHEMA_BG_COLOR #F0F0F0
+
+skinparam componentStyle uml2
+skinparam linetype polyline
+left to right direction 
+
+skinparam component {
+  BackgroundColor White
+  BorderColor Black
+}
+
+component [HTTP Router] as router
+database "PostgreSQL" as postgres
+cloud "Mailtrap/SendGrid\n(SMTP Server)" as smtp
+
+package "API Server System" {
+
+    package "Zod schemas" {
+        component [Quizz zod schema] as quizzSchema SCHEMA_BG_COLOR
+        component [Auth zod schema] as authSchema SCHEMA_BG_COLOR
+        component [User zod schema] as userSchema SCHEMA_BG_COLOR
+        
+        () "Quizz Validation Schema" as IValQuiz
+        () "Auth Validation Schema" as IValAuth
+        () "User Validation Schema" as IValUser
+        
+        quizzSchema -up- IValQuiz
+        authSchema -up- IValAuth
+        userSchema -up- IValUser
+    }
+
+    package "Controllers Layer" {
+        component [Quizz controller] as quizzController CONTROLLER_BG_COLOR
+        component [Auth controller] as authController CONTROLLER_BG_COLOR
+        component [User controller] as userController CONTROLLER_BG_COLOR
+        component [Global Error Handler] as errorController CONTROLLER_BG_COLOR
+        
+        () "Quizz EntryPoints" as IQuizEP
+        () "Auth EntryPoints" as IAuthEP
+        () "User EntryPoints" as IUserEP
+        
+        quizzController -left- IQuizEP
+        authController -left- IAuthEP
+        userController -left- IUserEP
+    }
+
+    package "Services Layer" {
+        component [Quizz Service] as quizzService COMPONENT_BG_COLOR
+        component [Auth Service] as authService COMPONENT_BG_COLOR
+        component [User Service] as userService COMPONENT_BG_COLOR
+        
+        () "Quizz Service" as ISvcQuiz
+        () "Auth Service" as ISvcAuth
+        () "User Service" as ISvcUser
+        
+        quizzService -left- ISvcQuiz
+        authService -left- ISvcAuth
+        userService -left- ISvcUser
+    }
+
+    component [Prisma ORM] as prisma
+    component [Mail Service] as mailService
+    
+    () "Data Access Layer" as IDAL
+    () "Mail Service" as IMail
+    
+    prisma -left- IDAL
+    mailService -left- IMail
+}
+
+router --( "API Contracts"
+"API Contracts" -- IQuizEP
+"API Contracts" -- IAuthEP
+"API Contracts" -- IUserEP
+
+quizzController ..> errorController : next(err)
+authController ..> errorController : next(err)
+userController ..> errorController : next(err)
+
+quizzController --( IValQuiz
+authController --( IValAuth
+userController --( IValUser
+
+quizzController --( ISvcQuiz
+authController --( ISvcAuth
+userController --( ISvcUser
+
+quizzService --( "Business Interface"
+authService --( "Business Interface"
+userService --( "Business Interface"
+
+"Business Interface" -- IDAL
+
+authService --( IMail
+
+prisma ..> postgres : SQL
+mailService --( "SMTP Server Connection"
+"SMTP Server Connection" -- smtp
+
+@enduml
