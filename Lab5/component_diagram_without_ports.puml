@@ -24,81 +24,109 @@ package "API Server System" {
         component [Quizz zod schema] as quizzSchema SCHEMA_BG_COLOR
         component [Auth zod schema] as authSchema SCHEMA_BG_COLOR
         component [User zod schema] as userSchema SCHEMA_BG_COLOR
+        component [Review zod schema] as reviewSchema SCHEMA_BG_COLOR
+        component [Bookmark zod schema] as bookmarkSchema SCHEMA_BG_COLOR
         
         () "Quizz Validation Schema" as IValQuiz
         () "Auth Validation Schema" as IValAuth
         () "User Validation Schema" as IValUser
+        () "Review Validation Schema" as IValReview
+        () "Bookmark Validation Schema" as IValBookmark
         
         quizzSchema -up- IValQuiz
         authSchema -up- IValAuth
         userSchema -up- IValUser
+        reviewSchema -up- IValReview
+        bookmarkSchema -up- IValBookmark
     }
 
     package "Controllers Layer" {
         component [Quizz controller] as quizzController CONTROLLER_BG_COLOR
         component [Auth controller] as authController CONTROLLER_BG_COLOR
         component [User controller] as userController CONTROLLER_BG_COLOR
+        component [Review controller] as reviewController CONTROLLER_BG_COLOR
+        component [Bookmark controller] as bookmarkController CONTROLLER_BG_COLOR
+        
         component [Global Error Handler] as errorController CONTROLLER_BG_COLOR
         
         () "Quizz EntryPoints" as IQuizEP
         () "Auth EntryPoints" as IAuthEP
         () "User EntryPoints" as IUserEP
+        () "Review EntryPoints" as IReviewEP
+        () "Bookmark EntryPoints" as IBookmarkEP
         
         quizzController -left- IQuizEP
         authController -left- IAuthEP
         userController -left- IUserEP
+        reviewController -left- IReviewEP
+        bookmarkController -left- IBookmarkEP
     }
 
     package "Services Layer" {
         component [Quizz Service] as quizzService COMPONENT_BG_COLOR
         component [Auth Service] as authService COMPONENT_BG_COLOR
         component [User Service] as userService COMPONENT_BG_COLOR
+        component [Review Service] as reviewService COMPONENT_BG_COLOR
+        component [Bookmark Service] as bookmarkService COMPONENT_BG_COLOR
         
-        () "Quizz Service" as ISvcQuiz
-        () "Auth Service" as ISvcAuth
-        () "User Service" as ISvcUser
+        () "Quizz Service Realization" as ISvcQuiz
+        () "Auth Service Realization" as ISvcAuth
+        () "User Service Realization" as ISvcUser
+        () "Review Service Realization" as ISvcReview
+        () "Bookmark Service Realization" as ISvcBookmark
         
         quizzService -left- ISvcQuiz
         authService -left- ISvcAuth
         userService -left- ISvcUser
+        reviewService -left- ISvcReview
+        bookmarkService -left- ISvcBookmark
     }
 
     component [Prisma ORM] as prisma
     component [Mail Service] as mailService
     
     () "Data Access Layer" as IDAL
-    () "Mail Service" as IMail
+    () "Mail Service Interface" as IMail
     
     prisma -left- IDAL
     mailService -left- IMail
 }
 
-router --( "API Contracts"
-"API Contracts" -- IQuizEP
-"API Contracts" -- IAuthEP
-"API Contracts" -- IUserEP
+router --( IQuizEP
+router --( IAuthEP
+router --( IUserEP
+router --( IReviewEP
+router --( IBookmarkEP
 
 quizzController ..> errorController : next(err)
 authController ..> errorController : next(err)
 userController ..> errorController : next(err)
+reviewController ..> errorController : next(err)
+bookmarkController ..> errorController : next(err)
 
 quizzController --( IValQuiz
 authController --( IValAuth
 userController --( IValUser
+reviewController --( IValReview
+bookmarkController --( IValBookmark
 
 quizzController --( ISvcQuiz
 authController --( ISvcAuth
 userController --( ISvcUser
+reviewController --( ISvcReview
+bookmarkController --( ISvcBookmark
 
-quizzService --( "Business Interface"
-authService --( "Business Interface"
-userService --( "Business Interface"
-
-"Business Interface" -- IDAL
+quizzService --( IDAL
+authService --( IDAL
+userService --( IDAL
+reviewService --( IDAL
+bookmarkService --( IDAL
 
 authService --( IMail
 
-prisma ..> postgres : SQL
+prisma --( "SQL Database Connection"
+"SQL Database Connection" -- postgres
+
 mailService --( "SMTP Server Connection"
 "SMTP Server Connection" -- smtp
 
