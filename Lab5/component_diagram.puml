@@ -20,44 +20,34 @@ skinparam port {
   FontColor transparent
 }
 
-' === EXTERNAL SYSTEMS ===
 database "PostgreSQL" as postgres
 cloud "SMTP Server" as smtp
 
-' === MAIN API CONTAINER ===
 component "API Server" as MainAPI {
     
-    ' Ports on the API Boundary
     port " " as pAPI_DB
     port " " as pAPI_SMTP
 
     component "HTTP Router" as router COMPONENT_BG_COLOR
 
-    ' === INTERFACES INSIDE API (Next to Router) ===
-    ' These interfaces connect the Router to the System Logic
     () "Auth Interface" as I_Router_Auth
     () "EntryPoint Config" as I_Router_Config
     () "Error Handling" as I_Router_Error
 
-    ' Router depends on these interfaces
     router --( I_Router_Auth
     router --( I_Router_Config
     router --( I_Router_Error
 
 
-    ' === CORE LOGIC SYSTEM ===
     component "Source code" as System {
 
-        ' Input Ports (Implement the interfaces)
         port " " as pSysAuth
         port " " as pSysError
         port " " as pSysConfig
         
-        ' Output Ports
         port " " as pSysSqlOut
         port " " as pSysSmtpOut
 
-        ' --- VALIDATION LAYER ---
         component "Zod Schemas Layer" as LayerValidation LAYER_BG_COLOR {
             port " " as pValQuiz
             port " " as pValAuth
@@ -78,7 +68,6 @@ component "API Server" as MainAPI {
             pValBookmark --> bookmarkSchema
         }
         
-        ' --- CONTROLLERS LAYER ---
         component "Controllers Layer" as LayerControllers LAYER_BG_COLOR {
             port " " as pCtrlConfigIn
             port " " as pCtrlErrIn
@@ -99,7 +88,6 @@ component "API Server" as MainAPI {
             component "Bookmark controller" as cBookmark CONTROLLER_BG_COLOR
             component "Global Error Handler" as cErr CONTROLLER_BG_COLOR
             
-            ' Config connections
             pCtrlConfigIn --> cAuth
             pCtrlConfigIn --> cQuiz
             pCtrlConfigIn --> cUser
@@ -107,27 +95,23 @@ component "API Server" as MainAPI {
             pCtrlConfigIn --> cBookmark
             pCtrlErrIn --> cErr
             
-            ' Auth Dependencies
             cQuiz .up.> cAuth : depends on
             cUser .up.> cAuth : depends on
             cReview .up.> cAuth : depends on
             cBookmark .up.> cAuth : depends on
             
-            ' Logic Connections
             cAuth --> pCtrlSvcAuth
             cQuiz --> pCtrlSvcQuiz
             cUser --> pCtrlSvcUser
             cReview --> pCtrlSvcReview
             cBookmark --> pCtrlSvcBookmark
             
-            ' Validation Connections
             cAuth --> pCtrlValOut
             cQuiz --> pCtrlValOut
             cUser --> pCtrlValOut
             cReview --> pCtrlValOut
             cBookmark --> pCtrlValOut
             
-            ' Error Flow
             cUser ..> cErr : next(err)
             cAuth ..> cErr : next(err)
             cQuiz ..> cErr : next(err)
@@ -137,7 +121,6 @@ component "API Server" as MainAPI {
             cErr --> pCtrlErrOut
         }
         
-        ' --- SERVICES LAYER ---
         component "Services Layer" as LayerServices LAYER_BG_COLOR {
             port " " as pSvcAuthAPI_In
             
@@ -189,9 +172,7 @@ component "API Server" as MainAPI {
             sAuth --> pSvcMail
         }
         
-        ' --- SYSTEM INTERNAL WIRING ---
         
-        ' Connecting System Ports to Internal Layers
         pSysAuth --> pSvcAuthAPI_In
         
         pSysConfig --( "Quizz EntryPoints"
@@ -211,7 +192,6 @@ component "API Server" as MainAPI {
         
         pSysError --> pCtrlErrIn
         
-        ' Wiring Layers together
         pCtrlSvcAuth --> pSvcAuthLogic_In
         pCtrlSvcQuiz --> pSvcQuizLogic_In
         pCtrlSvcUser --> pSvcUserLogic_In
@@ -233,12 +213,10 @@ component "API Server" as MainAPI {
         pSvcMail --> pSysSmtpOut
     }
 
-    ' === WIRING ROUTER TO SYSTEM ===
     I_Router_Auth -- pSysAuth
     I_Router_Config -- pSysConfig
     I_Router_Error -- pSysError
 
-    ' === INFRASTRUCTURE ADAPTERS ===
     component "Prisma ORM" as prisma COMPONENT_BG_COLOR
     component "Mail Service" as mailer COMPONENT_BG_COLOR
 
@@ -252,14 +230,12 @@ component "API Server" as MainAPI {
     mailer --> pAPI_SMTP
 }
 
-' === EXTERNAL WIRING ===
 pAPI_DB --( "SQL Database Connection"
 "SQL Database Connection" -- postgres
 
 pAPI_SMTP --( "SMTP Server Connection"
 "SMTP Server Connection" -- smtp
 
-' Layout Helpers
 router -[hidden]-> I_Router_Config
 I_Router_Config -[hidden]-> System
 System -[hidden]-> prisma
