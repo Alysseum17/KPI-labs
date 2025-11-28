@@ -1,4 +1,4 @@
-@startuml API_System_Double_Interfaces
+@startuml API_System_Router_Integration
 
 !define COMPONENT_BG_COLOR #E1F5FF
 !define SERVICE_BG_COLOR #FFF4E1
@@ -20,169 +20,248 @@ skinparam port {
   FontColor transparent
 }
 
-component "HTTP Router" as router
+' === EXTERNAL SYSTEMS ===
 database "PostgreSQL" as postgres
 cloud "SMTP Server" as smtp
 
-component "API Server System" as System {
-
-    port " " as pSysAuth
-    port " " as pSysError
-    port " " as pSysConfig
+' === MAIN API CONTAINER ===
+component "API Server" as MainAPI {
     
-    port " " as pSysSqlOut
-    port " " as pSysSmtpOut
+    ' Ports on the API Boundary
+    port " " as pAPI_DB
+    port " " as pAPI_SMTP
 
-    component "Zod Schemas Layer" as LayerValidation LAYER_BG_COLOR {
-        port " " as pValQuiz
-        port " " as pValAuth
-        port " " as pValUser
+    component "HTTP Router" as router COMPONENT_BG_COLOR
+
+    ' === INTERFACES INSIDE API (Next to Router) ===
+    ' These interfaces connect the Router to the System Logic
+    () "Auth Interface" as I_Router_Auth
+    () "EntryPoint Config" as I_Router_Config
+    () "Error Handling" as I_Router_Error
+
+    ' Router depends on these interfaces
+    router --( I_Router_Auth
+    router --( I_Router_Config
+    router --( I_Router_Error
+
+
+    ' === CORE LOGIC SYSTEM ===
+    component "Source code" as System {
+
+        ' Input Ports (Implement the interfaces)
+        port " " as pSysAuth
+        port " " as pSysError
+        port " " as pSysConfig
         
-        component "Quizz zod schema" as quizzSchema SCHEMA_BG_COLOR
-        component "Auth zod schema" as authSchema SCHEMA_BG_COLOR
-        component "User zod schema" as userSchema SCHEMA_BG_COLOR
+        ' Output Ports
+        port " " as pSysSqlOut
+        port " " as pSysSmtpOut
+
+        ' --- VALIDATION LAYER ---
+        component "Zod Schemas Layer" as LayerValidation LAYER_BG_COLOR {
+            port " " as pValQuiz
+            port " " as pValAuth
+            port " " as pValUser
+            port " " as pValReview
+            port " " as pValBookmark
+            
+            component "Quizz zod schema" as quizzSchema SCHEMA_BG_COLOR
+            component "Auth zod schema" as authSchema SCHEMA_BG_COLOR
+            component "User zod schema" as userSchema SCHEMA_BG_COLOR
+            component "Review zod schema" as reviewSchema SCHEMA_BG_COLOR
+            component "Bookmark zod schema" as bookmarkSchema SCHEMA_BG_COLOR
+            
+            pValQuiz --> quizzSchema
+            pValAuth --> authSchema
+            pValUser --> userSchema
+            pValReview --> reviewSchema
+            pValBookmark --> bookmarkSchema
+        }
         
-        pValQuiz --> quizzSchema
-        pValAuth --> authSchema
-        pValUser --> userSchema
+        ' --- CONTROLLERS LAYER ---
+        component "Controllers Layer" as LayerControllers LAYER_BG_COLOR {
+            port " " as pCtrlConfigIn
+            port " " as pCtrlErrIn
+            
+            port " " as pCtrlSvcAuth
+            port " " as pCtrlSvcQuiz
+            port " " as pCtrlSvcUser
+            port " " as pCtrlSvcReview
+            port " " as pCtrlSvcBookmark
+            
+            port " " as pCtrlValOut
+            port " " as pCtrlErrOut
+            
+            component "Auth controller" as cAuth CONTROLLER_BG_COLOR
+            component "Quizz controller" as cQuiz CONTROLLER_BG_COLOR
+            component "User controller" as cUser CONTROLLER_BG_COLOR
+            component "Review controller" as cReview CONTROLLER_BG_COLOR
+            component "Bookmark controller" as cBookmark CONTROLLER_BG_COLOR
+            component "Global Error Handler" as cErr CONTROLLER_BG_COLOR
+            
+            ' Config connections
+            pCtrlConfigIn --> cAuth
+            pCtrlConfigIn --> cQuiz
+            pCtrlConfigIn --> cUser
+            pCtrlConfigIn --> cReview
+            pCtrlConfigIn --> cBookmark
+            pCtrlErrIn --> cErr
+            
+            ' Auth Dependencies
+            cQuiz .up.> cAuth : depends on
+            cUser .up.> cAuth : depends on
+            cReview .up.> cAuth : depends on
+            cBookmark .up.> cAuth : depends on
+            
+            ' Logic Connections
+            cAuth --> pCtrlSvcAuth
+            cQuiz --> pCtrlSvcQuiz
+            cUser --> pCtrlSvcUser
+            cReview --> pCtrlSvcReview
+            cBookmark --> pCtrlSvcBookmark
+            
+            ' Validation Connections
+            cAuth --> pCtrlValOut
+            cQuiz --> pCtrlValOut
+            cUser --> pCtrlValOut
+            cReview --> pCtrlValOut
+            cBookmark --> pCtrlValOut
+            
+            ' Error Flow
+            cUser ..> cErr : next(err)
+            cAuth ..> cErr : next(err)
+            cQuiz ..> cErr : next(err)
+            cReview ..> cErr : next(err)
+            cBookmark ..> cErr : next(err)
+            
+            cErr --> pCtrlErrOut
+        }
+        
+        ' --- SERVICES LAYER ---
+        component "Services Layer" as LayerServices LAYER_BG_COLOR {
+            port " " as pSvcAuthAPI_In
+            
+            port " " as pSvcAuthLogic_In
+            port " " as pSvcQuizLogic_In
+            port " " as pSvcUserLogic_In
+            port " " as pSvcReviewLogic_In
+            port " " as pSvcBookmarkLogic_In
+            
+            port " " as pSvcOut
+            port " " as pSvcMail
+            
+            component "Auth Service" as sAuth SERVICE_BG_COLOR
+            component "Quiz Service" as sQuiz SERVICE_BG_COLOR
+            component "User Service" as sUser SERVICE_BG_COLOR
+            component "Review Service" as sReview SERVICE_BG_COLOR
+            component "Bookmark Service" as sBookmark SERVICE_BG_COLOR
+            
+            () "Auth API" as I_AuthAPI
+            
+            () "Auth Service Realization" as I_AuthSvc
+            () "Quizz Service Realization" as I_QuizSvc
+            () "User Service Realization" as I_UserSvc
+            () "Review Service Realization" as I_ReviewSvc
+            () "Bookmark Service Realization" as I_BookmarkSvc
+            
+            sAuth -up- I_AuthAPI
+            
+            sAuth -left- I_AuthSvc
+            sQuiz -left- I_QuizSvc
+            sUser -left- I_UserSvc
+            sReview -left- I_ReviewSvc
+            sBookmark -left- I_BookmarkSvc
+            
+            pSvcAuthAPI_In --( I_AuthAPI
+            
+            pSvcAuthLogic_In --( I_AuthSvc
+            pSvcQuizLogic_In --( I_QuizSvc
+            pSvcUserLogic_In --( I_UserSvc
+            pSvcReviewLogic_In --( I_ReviewSvc
+            pSvcBookmarkLogic_In --( I_BookmarkSvc
+            
+            sAuth --> pSvcOut
+            sQuiz --> pSvcOut
+            sUser --> pSvcOut
+            sReview --> pSvcOut
+            sBookmark --> pSvcOut
+            
+            sAuth --> pSvcMail
+        }
+        
+        ' --- SYSTEM INTERNAL WIRING ---
+        
+        ' Connecting System Ports to Internal Layers
+        pSysAuth --> pSvcAuthAPI_In
+        
+        pSysConfig --( "Quizz EntryPoints"
+        "Quizz EntryPoints" -- pCtrlConfigIn
+        
+        pSysConfig --( "Auth EntryPoints"
+        "Auth EntryPoints" -- pCtrlConfigIn
+        
+        pSysConfig --( "User EntryPoints"
+        "User EntryPoints" -- pCtrlConfigIn
+        
+        pSysConfig --( "Review EntryPoints"
+        "Review EntryPoints" -- pCtrlConfigIn
+        
+        pSysConfig --( "Bookmark EntryPoints"
+        "Bookmark EntryPoints" -- pCtrlConfigIn
+        
+        pSysError --> pCtrlErrIn
+        
+        ' Wiring Layers together
+        pCtrlSvcAuth --> pSvcAuthLogic_In
+        pCtrlSvcQuiz --> pSvcQuizLogic_In
+        pCtrlSvcUser --> pSvcUserLogic_In
+        pCtrlSvcReview --> pSvcReviewLogic_In
+        pCtrlSvcBookmark --> pSvcBookmarkLogic_In
+        
+        pCtrlValOut --( "Quizz Validation Schema"
+        "Quizz Validation Schema" -- pValQuiz
+        pCtrlValOut --( "Auth Validation Schema"
+        "Auth Validation Schema" -- pValAuth
+        pCtrlValOut --( "User Validation Schema"
+        "User Validation Schema" -- pValUser
+        pCtrlValOut --( "Review Validation Schema"
+        "Review Validation Schema" -- pValReview
+        pCtrlValOut --( "Bookmark Validation Schema"
+        "Bookmark Validation Schema" -- pValBookmark
+        
+        pSvcOut --> pSysSqlOut
+        pSvcMail --> pSysSmtpOut
     }
 
-    component "Controllers Layer" as LayerControllers LAYER_BG_COLOR {
-        port " " as pCtrlConfigIn
-        port " " as pCtrlErrIn
-        
-        port " " as pCtrlSvcAuth
-        port " " as pCtrlSvcQuiz
-        port " " as pCtrlSvcUser
-        
-        port " " as pCtrlValOut
-        port " " as pCtrlErrOut
-        
-        component "Auth controller" as cAuth CONTROLLER_BG_COLOR
-        component "Quizz controller" as cQuiz CONTROLLER_BG_COLOR
-        component "User controller" as cUser CONTROLLER_BG_COLOR
-        component "Global Error Handler" as cErr CONTROLLER_BG_COLOR
-        
-        pCtrlConfigIn --> cAuth
-        pCtrlConfigIn --> cQuiz
-        pCtrlConfigIn --> cUser
-        pCtrlErrIn --> cErr
-        
-        cAuth --> pCtrlSvcAuth
-        cQuiz --> pCtrlSvcQuiz
-        cUser --> pCtrlSvcUser
-        
-        cAuth --> pCtrlValOut
-        cQuiz --> pCtrlValOut
-        cUser --> pCtrlValOut
-        
-        cUser ..> cErr : next(err)
-        cAuth ..> cErr : next(err)
-        cQuiz ..> cErr : next(err)
-        cErr --> pCtrlErrOut
-    }
+    ' === WIRING ROUTER TO SYSTEM ===
+    I_Router_Auth -- pSysAuth
+    I_Router_Config -- pSysConfig
+    I_Router_Error -- pSysError
 
-    component "Services Layer" as LayerServices LAYER_BG_COLOR {
-        port " " as pSvcAuthAPI_In
-        port " " as pSvcQuizAPI_In
-        port " " as pSvcUserAPI_In
-        
-        port " " as pSvcAuthLogic_In
-        port " " as pSvcQuizLogic_In
-        port " " as pSvcUserLogic_In
-        
-        port " " as pSvcOut
-        port " " as pSvcMail
-        
-        component "Auth Service" as sAuth SERVICE_BG_COLOR
-        component "Quiz Service" as sQuiz SERVICE_BG_COLOR
-        component "User Service" as sUser SERVICE_BG_COLOR
-        
-        () "Auth API" as I_AuthAPI
-        () "Quizz API" as I_QuizAPI
-        () "User API" as I_UserAPI
-        
-        () "Auth Service" as I_AuthSvc
-        () "Quizz Service" as I_QuizSvc
-        () "User Service" as I_UserSvc
-        
-        sAuth -up- I_AuthAPI
-        sAuth -left- I_AuthSvc
-        
-        sQuiz -up- I_QuizAPI
-        sQuiz -left- I_QuizSvc
-        
-        sUser -up- I_UserAPI
-        sUser -left- I_UserSvc
-        
-        pSvcAuthAPI_In --( I_AuthAPI
-        
-        pSvcAuthLogic_In -- I_AuthSvc
-        pSvcQuizLogic_In -- I_QuizSvc
-        pSvcUserLogic_In -- I_UserSvc
-        
-        sAuth --> pSvcOut
-        sQuiz --> pSvcOut
-        sUser --> pSvcOut
-        sAuth --> pSvcMail
-    }
-
+    ' === INFRASTRUCTURE ADAPTERS ===
     component "Prisma ORM" as prisma COMPONENT_BG_COLOR
     component "Mail Service" as mailer COMPONENT_BG_COLOR
 
-    pSysAuth --> pSvcAuthAPI_In
+    pSysSqlOut --( "Data Access Layer"
+    "Data Access Layer" -- prisma
     
-    pSysConfig --( "Quizz EntryPoints"
-    "Quizz EntryPoints" -- pCtrlConfigIn
-    
-    pSysConfig --( "Auth EntryPoints"
-    "Auth EntryPoints" -- pCtrlConfigIn
-    
-    pSysConfig --( "User EntryPoints"
-    "User EntryPoints" -- pCtrlConfigIn
-    
-    pSysError --> pCtrlErrIn
-    
-    pCtrlSvcAuth --> pSvcAuthLogic_In
-    pCtrlSvcQuiz --> pSvcQuizLogic_In
-    pCtrlSvcUser --> pSvcUserLogic_In
-    
-    pCtrlValOut --( "Quizz Validation Schema"
-    "Quizz Validation Schema" -- pValQuiz
-    pCtrlValOut --( "Auth Validation Schema"
-    "Auth Validation Schema" -- pValAuth
-    pCtrlValOut --( "User Validation Schema"
-    "User Validation Schema" -- pValUser
-    
-    pSvcOut --( "IDataAccess"
-    "IDataAccess" -- prisma
-    pSvcMail --( "ISendMail"
-    "ISendMail" -- mailer
-    
-    prisma --> pSysSqlOut
-    mailer --> pSysSmtpOut
+    pSysSmtpOut --( "Mail Interface"
+    "Mail Interface" -- mailer
+
+    prisma --> pAPI_DB
+    mailer --> pAPI_SMTP
 }
 
-() "Auth" as I_Auth
-() "Error Handling" as I_Error
-() "EntryPoint Config" as I_Config
+' === EXTERNAL WIRING ===
+pAPI_DB --( "SQL Database Connection"
+"SQL Database Connection" -- postgres
 
-pSysAuth -up- I_Auth
-pSysError -up- I_Error
-pSysConfig -up- I_Config
+pAPI_SMTP --( "SMTP Server Connection"
+"SMTP Server Connection" -- smtp
 
-router --( I_Auth
-router --( I_Error
-router --( I_Config
-
-pSysSqlOut --( "SQL Protocol"
-"SQL Protocol" -- postgres
-pSysSmtpOut --( "SMTP Protocol"
-"SMTP Protocol" -- smtp
-
-router -[hidden]-> LayerControllers
-LayerValidation -[hidden]-> LayerControllers
-LayerControllers -[hidden]-> LayerServices
-LayerServices -[hidden]-> prisma
+' Layout Helpers
+router -[hidden]-> I_Router_Config
+I_Router_Config -[hidden]-> System
+System -[hidden]-> prisma
 
 @enduml
